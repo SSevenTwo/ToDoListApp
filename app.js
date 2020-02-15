@@ -1,4 +1,4 @@
-//jshint esversion:6
+//jshint esversion:8
 
 // Modules
 const express = require("express");
@@ -14,9 +14,10 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static("public"));
 
-
+//mongodb://localhost:27017/toDoListDB
+//mongodb+srv://s3788210:Abc123@cluster0-7v0dl.mongodb.net/toDoListDB
 // Mongoose set up
-mongoose.connect("mongodb://localhost:27017/toDoListDB", {
+mongoose.connect("mongodb+srv://s3788210:Abc123@cluster0-7v0dl.mongodb.net/toDoListDB", {
   useUnifiedTopology: true,
   useNewUrlParser: true
 });
@@ -71,7 +72,7 @@ app.get("/", function(req, res) {
   });
 });
 
-app.post("/", function(req, res) {
+app.post("/", async function(req, res) {
 
   const itemContent = req.body.newItem;
   const list = req.body.list;
@@ -81,15 +82,14 @@ app.post("/", function(req, res) {
   });
 
   if(list === "Today"){
-    newItem.save();
+    await newItem.save();
     res.redirect("/");
   } else{
-    List.findOne({name:list},function(err,foundList){
+    List.findOne({name:list}, async function(err,foundList){
       foundList.items.push(newItem);
-      foundList.save();
+      await foundList.save();
+      res.redirect("/" + list);
     });
-
-    res.redirect("/" + list);
   }
 
 });
@@ -106,8 +106,8 @@ app.post("/delete", function(req, res) {
       console.log(err);
     } else console.log("Deleted item.");
     });
-
     res.redirect("/");
+    
   }else{
     List.findOneAndUpdate({name:list},
       {$pull: // we will pull
@@ -125,7 +125,7 @@ app.post("/delete", function(req, res) {
 app.get("/:listType", function(req, res) {
   const customListName = _.capitalize(req.params.listType);
 
-  List.findOne({ name: customListName }, function(err, list) {
+  List.findOne({ name: customListName }, async function(err, list) {
     if (!err) {
       if (list) {
         res.render("list", { listTitle: customListName, newListItems: list.items });
@@ -135,7 +135,7 @@ app.get("/:listType", function(req, res) {
           items: defaultItems
         });
 
-        list.save();
+        await list.save();
         res.redirect("/" + customListName);
       }
     } else console.log(err);
