@@ -1,19 +1,27 @@
 //jshint esversion:6
 
-module.exports.getDate = function() {
-  let options = {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long'
+exports.getDate = function() {
+
+  const today = new Date();
+
+  const options = {
+    weekday: "long",
+    day: "numeric",
+    month: "long"
   };
 
-  return new Date().toLocaleDateString("en-AU", options);
+  return today.toLocaleDateString("en-US", options);
+
 };
 
-module.exports.getDay = function() {
-  let options = {
-    weekday: 'long'
+exports.getDay = function () {
+
+  const today = new Date();
+
+  const options = {
+    weekday: "long"
   };
 
-  return new Date().toLocaleDateString("en-AU", options);
+  return today.toLocaleDateString("en-US", options);
+
 };
